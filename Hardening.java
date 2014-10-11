@@ -4,7 +4,7 @@ import java.security.SignatureException;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-public class Hardening
+public class Hardening extends Exception
 {
 	/* Size of History file */
 	int h=8;
@@ -14,8 +14,6 @@ public class Hardening
 
 	/* Coeffecients */
 	int[] c = new int[15];
-
-	private static final String HMAC_SHA1_ALGORITHM = "HmacSHA1";
 
 	/* Constructor. */
 	public Hardening()
@@ -49,7 +47,7 @@ http://crypto.stackexchange.com/questions/6455/how-to-generate-a-random-polynomi
 			if(i==0)
 				c[0]=12345;
 			else	
-			c[i]=rand.nextInt(q.intValue())+1;
+			c[i]=rand.nextInt(100)+1;
 
 			System.out.println("Coefficient of x^"+i+" is "+c[i]);
 		}
@@ -72,52 +70,45 @@ http://crypto.stackexchange.com/questions/6455/how-to-generate-a-random-polynomi
 
 		/* Using Formulas for alpha and beta
 			a[i]=y[i] + G(r,pwd)(2i)mod q
-			b[i]=z[i]+G(r,pwd)(2i)mod */
+			b[i]=z[i] + G(r,pwd)(2i)mod q*/
 		
-		for(inti=0;i<15;i++)
+		for(int i=0;i<15;i++)
 		{
-			
+			a[i]= Polynomial_Calculation(2*i) + generateHMac("password", Integer.toString(2*i), "HmacSHA256");
+			b[i]= Polynomial_Calculation((2*i)+1) + generateHMac("password", Integer.toString((2*i)+1), "HmacSHA256");
 		}
 
 	}	
 	
-		/**
-		Source: http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/AuthJavaSampleHMACSignature.html
-		* Computes RFC 2104-compliant HMAC signature.
-		* * @param data
-		* The data to be signed.
-		* @param key
-		* The signing key.
-		* @return
-		* The Base64-encoded RFC 2104-compliant HMAC signature.
-		* @throws
-		* java.security.SignatureException when signature generation fails
-		*/
-		public static String calculateRFC2104HMAC(String data, String key)
-		throws java.security.SignatureException
+	/* Calculating value of Polynomial required for alpha and beta. */
+	
+	public int Polynomial_Calculation(int x)
+	{
+		int f=0;
+		for (int i=0;i<15;i++)
 		{
-		String result;
+			f+=c[i]*pow(x,i);
+		}
+		return f;
+	}
+	public byte[] generateHMac(String secretKey, String data, String algorithm /* e.g. "HmacSHA256" */)
+	{
+
+	    	SecretKeySpec signingKey = new SecretKeySpec(secretKey.getBytes(), algorithm);
+
 		try {
+			Mac mac = Mac.getInstance(algorithm);
+			mac.init(signingKey);
 
-		// get an hmac_sha1 key from the raw key bytes
-		SecretKeySpec signingKey = new SecretKeySpec(key.getBytes(), HMAC_SHA1_ALGORITHM);
-
-		// get an hmac_sha1 Mac instance and initialize with the signing key
-		Mac mac = Mac.getInstance(HMAC_SHA1_ALGORITHM);
-		mac.init(signingKey);
-
-		// compute the hmac on input data bytes
-		byte[] rawHmac = mac.doFinal(data.getBytes());
-
-		// base64-encode the hmac
-		result = Encoding.EncodeBase64(rawHmac);
-
-		} catch (Exception e) {
-		throw new SignatureException("Failed to generate HMAC : " + e.getMessage());
-		}
-		return result;
-		}
-}
+			return mac.doFinal(data.getBytes());
+		    }
+		    catch(InvalidKeyException e) {
+			throw new IllegalArgumentException("invalid secret key provided (key not printed for security reasons!)");
+		    }
+		    catch(NoSuchAlgorithmException e) {
+			throw new IllegalStateException("the system doesn't support algorithm " + algorithm, e);
+		    }
+	}
 
 	public static void main(String[] args)
 	{
