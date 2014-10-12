@@ -165,10 +165,48 @@ http://crypto.stackexchange.com/questions/6455/how-to-generate-a-random-polynomi
 	/* Encrypting History File using DES. */
 	public void His_Encrypt()
 	{
-		RandomAccess File fis= new RandomAccessFile("History_File.txt")
-		RandomAccess File fis= new RandomAccessFile("History_File.txt")
+		RandomAccessFile fis= new RandomAccessFile("History_File.txt")
+		RandomAccessFile fos= new RandomAccessFile("Enc_History_File.txt")
+		encryptOrDecrypt(c[0],Cipher.ENCRYPT_MODE,fis,fos);
 	}
 
+	/* Decrypting History File using DES. */
+	public void His_Decrypt()
+	{
+		RandomAccess File fis= new RandomAccessFile("Enc_History_File.txt")
+		RandomAccess File fos= new RandomAccessFile("Dec_History_File.txt")
+		encryptOrDecrypt(c[0],Cipher.DECRYPT_MODE,fis,fos);
+	}
+	
+	/* Encrypt or Decrypt. */
+	public void encryptOrDecrypt(String key, int mode, RandomAccessFile fis) throws Throwable
+	{
+		DESKeySpec dks = new DESKeySpec(key.getBytes());
+		SecretKeyFactory skf = SecretKeyFactory.getInstance("DES");
+		SecretKey desKey = skf.generateSecret(dks);
+		Cipher cipher = Cipher.getInstance("DES"); // DES/ECB/PKCS5Padding for SunJCE
+
+		if (mode == Cipher.ENCRYPT_MODE) {
+			cipher.init(Cipher.ENCRYPT_MODE, desKey);
+			CipherInputStream cis = new CipherInputStream(fis, cipher);
+			doCopy(cis, fis);
+		} else if (mode == Cipher.DECRYPT_MODE) {
+			cipher.init(Cipher.DECRYPT_MODE, desKey);
+			CipherOutputStream cos = new CipherOutputStream(fis, cipher);
+			doCopy(fis, cos);
+		}
+	}
+
+	public static void doCopy(InputStream is, OutputStream os) throws IOException {
+		byte[] bytes = new byte[64];
+		int numBytes;
+		while ((numBytes = is.read(bytes)) != -1) {
+			os.write(bytes, 0, numBytes);
+		}
+		os.flush();
+		os.close();
+		is.close();
+	}
 	public static void main(String[] args)
 	{
 		Hardening Hpwd= new Hardening();
