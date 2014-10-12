@@ -95,7 +95,7 @@ http://crypto.stackexchange.com/questions/6455/how-to-generate-a-random-polynomi
 		int f=0;
 		for (int i=0;i<15;i++)
 		{
-			f+=c[i]*(pow(x,i));
+			f+=c[i]*(Math.pow(x,i));
 		}
 		return f;
 	}
