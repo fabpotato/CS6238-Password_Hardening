@@ -7,6 +7,12 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import javax.crypto.Cipher;
+import javax.crypto.CipherInputStream;
+import javax.crypto.CipherOutputStream;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.DESKeySpec;
 
 public class Hardening extends Exception
 {
@@ -49,7 +55,7 @@ http://crypto.stackexchange.com/questions/6455/how-to-generate-a-random-polynomi
 			//Changing the value of c[0] to the Hpwd. Assuming Hpwd=12345
 
 			if(i==0)
-				c[0]=12345;
+				c[0]=123456789;
 			else	
 			c[i]=rand.nextInt(10)+1;  //Changed this from q to 100: Do Check again(Consult TA)
 
@@ -152,8 +158,7 @@ http://crypto.stackexchange.com/questions/6455/how-to-generate-a-random-polynomi
 	{
 		try
 		{
-			RandomAccessFile History_file= new RandomAccessFile("History_File.txt","rw");
-			History_file.setLength(1024);
+			FileOutputStream History_file= new FileOutputStream("History_File.txt");
 			History_file.write("This is the History File".getBytes());
 			History_file.close();
 		}
@@ -165,21 +170,36 @@ http://crypto.stackexchange.com/questions/6455/how-to-generate-a-random-polynomi
 	/* Encrypting History File using DES. */
 	public void His_Encrypt()
 	{
-		RandomAccessFile fis= new RandomAccessFile("History_File.txt")
-		RandomAccessFile fos= new RandomAccessFile("Enc_History_File.txt")
-		encryptOrDecrypt(c[0],Cipher.ENCRYPT_MODE,fis,fos);
+		try 
+		{
+		FileInputStream fis= new FileInputStream("History_File.txt");
+		FileOutputStream fos= new FileOutputStream("Enc_History_File.txt");
+		encryptOrDecrypt(Integer.toString(c[0]),Cipher.ENCRYPT_MODE,fis,fos);
+		}
+		catch(Throwable e)
+		{
+			System.out.println(e.getMessage());
+		}
+
 	}
 
 	/* Decrypting History File using DES. */
 	public void His_Decrypt()
 	{
-		RandomAccess File fis= new RandomAccessFile("Enc_History_File.txt")
-		RandomAccess File fos= new RandomAccessFile("Dec_History_File.txt")
-		encryptOrDecrypt(c[0],Cipher.DECRYPT_MODE,fis,fos);
+		try 
+		{
+			FileInputStream fis= new FileInputStream("Enc_History_File.txt");
+			FileOutputStream fos= new FileOutputStream("Dec_History_File.txt");
+			encryptOrDecrypt(Integer.toString(c[0]),Cipher.DECRYPT_MODE,fis,fos);
+		}
+		catch(Throwable e)
+		{
+			System.out.println(e.getMessage());
+		}	
 	}
 	
 	/* Encrypt or Decrypt. */
-	public void encryptOrDecrypt(String key, int mode, RandomAccessFile fis) throws Throwable
+	public void encryptOrDecrypt(String key, int mode, FileInputStream is, FileOutputStream os) throws Throwable
 	{
 		DESKeySpec dks = new DESKeySpec(key.getBytes());
 		SecretKeyFactory skf = SecretKeyFactory.getInstance("DES");
@@ -188,13 +208,24 @@ http://crypto.stackexchange.com/questions/6455/how-to-generate-a-random-polynomi
 
 		if (mode == Cipher.ENCRYPT_MODE) {
 			cipher.init(Cipher.ENCRYPT_MODE, desKey);
-			CipherInputStream cis = new CipherInputStream(fis, cipher);
-			doCopy(cis, fis);
+			CipherInputStream cis = new CipherInputStream(is, cipher);
+			doCopy(cis, os);
 		} else if (mode == Cipher.DECRYPT_MODE) {
 			cipher.init(Cipher.DECRYPT_MODE, desKey);
-			CipherOutputStream cos = new CipherOutputStream(fis, cipher);
-			doCopy(fis, cos);
+			CipherOutputStream cos = new CipherOutputStream(os, cipher);
+			doCopy(is, cos);
 		}
+	}
+
+	public static void doCopy(InputStream is, OutputStream os) throws IOException {
+		byte[] bytes = new byte[64];
+		int numBytes;
+		while ((numBytes = is.read(bytes)) != -1) {
+			os.write(bytes, 0, numBytes);
+		}
+		os.flush();
+		os.close();
+		is.close();
 	}
 	public static void main(String[] args)
 	{
@@ -203,5 +234,6 @@ http://crypto.stackexchange.com/questions/6455/how-to-generate-a-random-polynomi
 		Hpwd.Polynomials(Hpwd.q);
 		Hpwd.Instruction_Table();
 		Hpwd.History_File();
+		Hpwd.His_Encrypt();
 	}
 }
