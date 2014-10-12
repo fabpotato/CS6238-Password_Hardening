@@ -14,7 +14,8 @@ import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
 
-public class Hardening extends Exception
+/* Class for the Initialization. */
+public class Initialization extends Exception
 {
 	/* Size of History file */
 	int h=8;
@@ -227,13 +228,20 @@ http://crypto.stackexchange.com/questions/6455/how-to-generate-a-random-polynomi
 		os.close();
 		is.close();
 	}
+}
+
+
+/* Class for login Attempts. */
+public class Login extends Exception
+
 	public static void main(String[] args)
 	{
-		Hardening Hpwd= new Hardening();
+		Initialization Hpwd= new Initialization();
 		System.out.println("Prime number is "+Hpwd.q);
 		Hpwd.Polynomials(Hpwd.q);
 		Hpwd.Instruction_Table();
 		Hpwd.History_File();
 		Hpwd.His_Encrypt();
+		Hpwd.His_Decrypt();
 	}
 }
