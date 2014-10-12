@@ -161,6 +161,13 @@ http://crypto.stackexchange.com/questions/6455/how-to-generate-a-random-polynomi
 			System.err.println(e);}
 		
 	}
+	
+	/* Encrypting History File using DES. */
+	public void His_Encrypt()
+	{
+		RandomAccess File fis= new RandomAccessFile("History_File.txt")
+		RandomAccess File fis= new RandomAccessFile("History_File.txt")
+	}
 
 	public static void main(String[] args)
 	{

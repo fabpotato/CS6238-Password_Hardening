@@ -154,12 +154,18 @@ http://crypto.stackexchange.com/questions/6455/how-to-generate-a-random-polynomi
 		{
 			RandomAccessFile History_file= new RandomAccessFile("History_File.txt","rw");
 			History_file.setLength(1024);
-			History_file.writeChars("This is the History File.");
+			History_file.write("This is the History File".getBytes());
 			History_file.close();
 		}
 		catch(Exception e){
 			System.err.println(e);}
 		
+	}
+	
+	/* Encrypting History File using DES. */
+	public void His_Encrypt()
+	{
+		RandomAccess File fis= new RandomAccessFile("History_File.txt")
 	}
 
 	public static void main(String[] args)
