@@ -74,12 +74,19 @@ http://crypto.stackexchange.com/questions/6455/how-to-generate-a-random-polynomi
 		
 		for(int i=0;i<15;i++)
 		{
-			a[i]= Polynomial_Calculation(2*i) + generateHMac("password", Integer.toString(2*i), "HmacSHA256");
-			b[i]= Polynomial_Calculation((2*i)+1) + generateHMac("password", Integer.toString((2*i)+1), "HmacSHA256");
+			a[i]= Polynomial_Calculation(2*i) + byteArrayToInt(generateHMac("password", Integer.toString(2*i), "HmacSHA256"));
+			b[i]= Polynomial_Calculation((2*i)+1) + byteArrayToInt(generateHMac("password", Integer.toString((2*i)+1), "HmacSHA256"));
 		}
 
 	}	
-	
+	/* generateHMac returns a byte array which needs to be converted to Int */
+	public static int byteArrayToInt(byte[] b) 
+	{
+	    return   b[3] & 0xFF |
+		    (b[2] & 0xFF) << 8 |
+		    (b[1] & 0xFF) << 16 |
+		    (b[0] & 0xFF) << 24;
+	}
 	/* Calculating value of Polynomial required for alpha and beta. */
 	
 	public int Polynomial_Calculation(int x)
