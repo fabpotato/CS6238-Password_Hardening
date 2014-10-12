@@ -1,4 +1,5 @@
 import java.lang.Math.*;
+import java.io.*;
 import java.math.*;
 import java.util.*;
 import java.security.SignatureException;
@@ -56,7 +57,7 @@ http://crypto.stackexchange.com/questions/6455/how-to-generate-a-random-polynomi
 		}
 		
 	}
-
+	/* Function to compute the value of alpha and beta */
 	public void Instruction_Table()
 	{
 		//z[i] stands for the ith value of y for an account 'a'--> Similar to y(a,i,1) 
@@ -73,7 +74,7 @@ http://crypto.stackexchange.com/questions/6455/how-to-generate-a-random-polynomi
 
 		/* Using Formulas for alpha and beta
 			a[i]=y[i] + G(r,pwd)(2i)mod q
-			b[i]=z[i] + G(r,pwd)(2i)mod q*/
+			b[i]=z[i] + G(r,pwd)(2i)mod q */
 		
 		for(int i=0;i<15;i++)
 		{
@@ -123,9 +124,10 @@ http://crypto.stackexchange.com/questions/6455/how-to-generate-a-random-polynomi
 		{
 			f+=c[i]*(Math.pow(x,i));
 		}
-		System.out.println(f);
+		//System.out.println(f);
 		return f;
 	}
+	/* Function to Compute Keyed Hash */
 	public byte[] generateHMac(String secretKey, String data, String algorithm /* e.g. "HmacSHA256" */)
 	{
 
@@ -145,11 +147,27 @@ http://crypto.stackexchange.com/questions/6455/how-to-generate-a-random-polynomi
 		    }
 	}
 
+	/* History File Creation and Updation. */
+	public void History_File()
+	{
+		try
+		{
+			RandomAccessFile History_file= new RandomAccessFile("History_File.txt","rw");
+			History_file.setLength(1024);
+			History_file.writeChars("This is the History File.");
+			History_file.close();
+		}
+		catch(Exception e){
+			System.err.println(e);}
+		
+	}
+
 	public static void main(String[] args)
 	{
 		Hardening Hpwd= new Hardening();
 		System.out.println("Prime number is "+Hpwd.q);
 		Hpwd.Polynomials(Hpwd.q);
 		Hpwd.Instruction_Table();
+		Hpwd.History_File();
 	}
 }
