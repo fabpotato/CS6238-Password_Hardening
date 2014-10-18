@@ -24,10 +24,10 @@ public class initialize {
 
 	
 	//a is the alpha value for account a's ith feature
-	BigInteger[] a=new BigInteger[15];
+	BigInteger[] a=new BigInteger[16];
 
 	//b is the beta value for account a's ith feature
-	BigInteger[] b=new BigInteger[15];
+	BigInteger[] b=new BigInteger[16];
 
 	
 	
@@ -61,6 +61,7 @@ public class initialize {
 			if(i==0){
 				
 				c[0]= BigInteger.valueOf(1234567890);
+				System.out.println(c[0]);
 			}
 				
 			else	{
@@ -86,12 +87,12 @@ public class initialize {
 			a[i]=y[i] + G(r,pwd)(2i)mod q
 			b[i]=z[i] + G(r,pwd)(2i)mod q */
 		
-		for(int i=0;i<15;i++)
+		for(int i=1;i<=15;i++)
 		{
-			a[i]= (Polynomial_Calculation(2*i).add(generateHMac("password", Integer.toString(2*i), "HmacSHA256"))).mod(q);
-			System.out.println(a[i]);
-			b[i]= (Polynomial_Calculation((2*i)+1).add(generateHMac("password", Integer.toString((2*i)+1), "HmacSHA256"))).mod(q);
-			System.out.println(b[i]);
+			a[i]= Polynomial_Calculation(2*i).add(generateHMac("password", Integer.toString(2*i), "HmacSHA256").mod(q));
+			System.out.println("Alpha value is "+a[i]);
+			b[i]= Polynomial_Calculation((2*i)+1).add(generateHMac("password", Integer.toString((2*i)+1), "HmacSHA256").mod(q));
+			System.out.println("Beta value is "+b[i]);
 		}
 
 	}
@@ -122,7 +123,7 @@ public class initialize {
 			BigInteger mul = new BigDecimal(Math.pow(x,i)).toBigInteger();
 			f=f.add(c[i].multiply(mul));
 		}
-		//System.out.println(f);
+		System.out.println("X and Y generated is "+x+"and "+f);
 		return f;
 	}
 	

@@ -10,12 +10,12 @@ import au.com.bytecode.opencsv.CSVReader;
 public class LoginAttempt{
 
 	
-	BigInteger[] featureValuesReceived = new BigInteger[15];
+	BigInteger[] featureValuesReceived = new BigInteger[16];
 	private String fileDir = ""; 
 	public String pwd;
 	
 	
-	BigInteger[] thresholdValues = new BigInteger[15];
+	BigInteger[] thresholdValues = new BigInteger[16];
 	
 	public BigInteger[] loginAttempt() throws NumberFormatException, IOException{
 		
@@ -45,8 +45,8 @@ public class LoginAttempt{
 		    	
 		    	for(int i=0; i<15; i++){
 		    
-		    			featureValuesReceived[i] = BigInteger.valueOf(Integer.parseInt(nextLine[i]));
-		    			System.out.println(featureValuesReceived[i]);
+		    			featureValuesReceived[i+1] = BigInteger.valueOf(Integer.parseInt(nextLine[i]));
+		    			System.out.println(featureValuesReceived[i+1]);
 		    	}
 		    }
 			
@@ -82,8 +82,8 @@ public class LoginAttempt{
 		    	//Extracting thresholdvalues from the thresholdvalues.txt file and storing them in an integer array.
 		    	for(int i=0; i<15; i++){
 		    		
-		    			thresholdValues[i] = BigInteger.valueOf(Integer.parseInt(nextLine[i]));
-		    			System.out.println("\n"+thresholdValues[i]);
+		    			thresholdValues[i+1] = BigInteger.valueOf(Integer.parseInt(nextLine[i]));
+		    			System.out.println("\n"+thresholdValues[i+1]);
 		    	}
 		    }
 			
@@ -122,22 +122,40 @@ public class LoginAttempt{
 	
 	
 	//To calculate the y co-ordinates
-	public BigInteger calculateHpwdnew(BigInteger[] y,BigInteger[] x){
+	public BigInteger calculateHpwdnew(BigInteger[] y,BigInteger[] x, BigInteger q){
 		
-		BigInteger hpwd=BigInteger.valueOf(0);
+		/*BigDecimal hpwd=new BigDecimal(0);
+		System.out.println("Q is"+q);
 		for(int i =0;i<15;i++)
 		{
-			hpwd=hpwd.add(y[i].multiply(calculateLagrangeMultiplier(x[i],i,x)));
+			hpwd=hpwd.add((new BigDecimal(y[i]).multiply(calculateLagrangeMultiplier(x[i],i,x)).remainder(new BigDecimal(q))));
+		}
+		return hpwd;*/
+		BigInteger hpwd =  BigInteger.valueOf(0);
+		for(int i=1;i<=15;i++)
+		{
+			BigInteger mul =  BigInteger.valueOf(1);
+			for(int j=1;j<=15;j++)
+			{
+				if(j!=i)
+				{
+					//System.out.println("j and i are "+j+" and "+i);
+					//System.out.println("Value of x[j] and x[i] is "+x[j]+" and "+x[i]);
+					mul=mul.multiply(x[j].divide(x[j].subtract(x[i])));	
+				}
+				//System.out.println(mul);
+				hpwd=hpwd.add(mul.multiply(y[i]).mod(q));
+			}
 		}
 		return hpwd;
 	}
 	
 	
 	//Calculating lagrange multiplier
-	public BigInteger calculateLagrangeMultiplier(BigInteger xi,int i, BigInteger[] x){
+	public BigDecimal calculateLagrangeMultiplier(BigInteger xi,int i, BigInteger[] x){
 		
-		BigInteger LagrangeMultiplier=BigInteger.valueOf(1);
-		for(int j=0;j<15;j++)
+		BigDecimal LagrangeMultiplier=new BigDecimal(1);
+		for(int j=1;j<=15;j++)
 		{	
 			if(j==i)
 			{
@@ -145,10 +163,14 @@ public class LoginAttempt{
 				System.out.println("Catching j=i");
 			}
 			else
+			{
 			System.out.println("Value of x[j] and x[i] is "+x[j]+" and "+x[i]);
-			LagrangeMultiplier=LagrangeMultiplier.multiply(x[j].divide((x[j].subtract(x[i]))));
+			System.out.println("Subtraction of x[j] and x[i] is "+x[j].subtract(x[i]));
+			BigDecimal div_part= new BigDecimal(x[j]).subtract(new BigDecimal(x[i]));
+			LagrangeMultiplier=LagrangeMultiplier.multiply(new BigDecimal(x[j]).divide(div_part,3,RoundingMode.HALF_UP));
+			}
 		}
-		System.out.println("LagrangeMultiplier for i = "+i+" is "+LagrangeMultiplier+".");
+		//System.out.println("LagrangeMultiplier for i = "+i+" is "+LagrangeMultiplier+".");
 		return LagrangeMultiplier;
 		
 		
