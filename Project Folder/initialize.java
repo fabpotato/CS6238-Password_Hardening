@@ -21,6 +21,7 @@ public class initialize {
 
 	/* Coefficients */
 	BigInteger[] c = new BigInteger[15];
+	public static int setSize = 1024;
 
 	
 	//a is the alpha value for account a's ith feature
@@ -156,12 +157,18 @@ public class initialize {
 		try
 		{
 			
-			File f = new File("History_File.txt");
-			FileOutputStream History_file= new FileOutputStream("History_File.txt");
+			File f = new File("Dec_History_File.txt");
+			FileOutputStream History_file= new FileOutputStream("Dec_History_File.txt");
 			//long size = f.getTotalSpace();
 			//System.out.println("Size of file: " + size);
-			History_file.write("0,0,0,0,0,0,0,0,0,0,0,0,0,0,0".getBytes());
-			
+			//History_file.write("This is the History File".getBytes());
+			long size = f.length();
+			while(size<setSize-("This is the History File".getBytes().length))
+			{
+				History_file.write("0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n".getBytes());
+				size=f.length();
+			}
+			History_file.write("This is the History File".getBytes());
 			History_file.close();
 		}
 		catch(Exception e){

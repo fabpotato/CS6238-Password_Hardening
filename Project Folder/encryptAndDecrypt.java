@@ -24,7 +24,7 @@ public class encryptAndDecrypt {
 	{
 		try 
 		{
-		FileInputStream fis= new FileInputStream("History_File.txt");
+		FileInputStream fis= new FileInputStream("Dec_History_File.txt");
 		FileOutputStream fos= new FileOutputStream("Enc_History_File.txt");
 		encryptOrDecrypt(new String(c.toByteArray()),Cipher.ENCRYPT_MODE,fis,fos);
 		}

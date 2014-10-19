@@ -1,6 +1,7 @@
 package edu.gatech.scs.pwd.hardening;
 import java.math.*;
 import java.io.File;
+import java.io.*;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
@@ -122,7 +123,7 @@ public class LoginAttempt{
 	
 	
 	//To calculate the y co-ordinates
-	public BigInteger calculateHpwdnew(BigInteger[] y,BigInteger[] x, BigInteger q){
+	public BigDecimal calculateHpwdnew(BigInteger[] y,BigInteger[] x, BigInteger q){
 		
 		/*BigDecimal hpwd=new BigDecimal(0);
 		System.out.println("Q is"+q);
@@ -131,6 +132,30 @@ public class LoginAttempt{
 			hpwd=hpwd.add((new BigDecimal(y[i]).multiply(calculateLagrangeMultiplier(x[i],i,x)).remainder(new BigDecimal(q))));
 		}
 		return hpwd;*/
+		BigDecimal hpwd =  new BigDecimal(0);
+		for(int i=1;i<=15;i++)
+		{
+			BigDecimal mul =  new BigDecimal(1);
+			for(int j=1;j<=15;j++)
+			{
+				if(j!=i)
+				{
+					//System.out.println(mul);
+					//System.out.println("j and i are "+j+" and "+i);
+					//System.out.println("Value of x[j] and x[i] is "+x[j]+" and "+x[i]);
+					BigDecimal div_part= new BigDecimal(x[j]).subtract(new BigDecimal(x[i]));
+					mul=mul.multiply(new BigDecimal(x[j]).divide(div_part,3,RoundingMode.HALF_UP));	
+
+				}
+			}
+			hpwd=hpwd.add(mul.multiply(new BigDecimal(y[i])).remainder(new BigDecimal(q)));	
+		}
+		return hpwd;
+	}
+
+	public BigInteger calculateHpwdnew1(BigInteger[] y,BigInteger[] x, BigInteger q){
+		
+
 		BigInteger hpwd =  BigInteger.valueOf(0);
 		for(int i=1;i<=15;i++)
 		{
@@ -141,18 +166,63 @@ public class LoginAttempt{
 				{
 					//System.out.println("j and i are "+j+" and "+i);
 					//System.out.println("Value of x[j] and x[i] is "+x[j]+" and "+x[i]);
-					mul=mul.multiply(x[j].divide(x[j].subtract(x[i])));	
+					BigInteger div_part= x[j].subtract(x[i]);
+					mul=mul.multiply(x[j].divide(div_part));	
 				}
-				//System.out.println(mul);
-				hpwd=hpwd.add(mul.multiply(y[i]).mod(q));
 			}
+				//System.out.println(mul);
+				hpwd=hpwd.add(mul.multiply(y[i]).mod(q));	
 		}
 		return hpwd;
 	}
 	
-	
+	public void History_File_Update(int line_no,BigInteger[] featureValuesReceived)
+	{
+		try{
+		if(line_no<8)
+		{
+			FileOutputStream File = new FileOutputStream("Dec_History_File.temp");
+			BufferedReader reader= new BufferedReader(new FileReader("Dec_History_File.txt"));
+			String line;
+			while(reader.readLine()!=null)
+			{
+			
+				while(line_no!=0)
+				{
+					System.out.println(line_no);
+					line=reader.readLine();
+					line_no--;
+					System.out.println(line);
+					File.write(line.getBytes());
+				}
+				if(line_no==0)
+				{
+				for(int i=1;i<16;i++)
+				{
+					System.out.println(featureValuesReceived[i]);
+					File.write(featureValuesReceived[i].toByteArray());
+
+				}
+					reader.readLine();
+					line_no=-1;
+				}
+				line=reader.readLine();
+				File.write(line.getBytes());
+
+
+			}
+				File.close();
+				reader.close();
+				new File("Dec_History_File.temp").renameTo(new File("Dec_history_text1.txt"));
+		}
+		}
+		catch(Exception e){
+			e.printStackTrace();}
+	}
+
+
 	//Calculating lagrange multiplier
-	public BigDecimal calculateLagrangeMultiplier(BigInteger xi,int i, BigInteger[] x){
+	/* public BigDecimal calculateLagrangeMultiplier(BigInteger xi,int i, BigInteger[] x){
 		
 		BigDecimal LagrangeMultiplier=new BigDecimal(1);
 		for(int j=1;j<=15;j++)
@@ -174,7 +244,7 @@ public class LoginAttempt{
 		return LagrangeMultiplier;
 		
 		
-	}
+	}*/
 	
 	
 }
