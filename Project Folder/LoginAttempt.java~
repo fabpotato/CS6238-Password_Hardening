@@ -120,7 +120,8 @@ public class LoginAttempt{
 		return 1;
 		
 	}
-	
+
+
 	
 	//To calculate the y co-ordinates
 	public BigDecimal calculateHpwdnew(BigInteger[] y,BigInteger[] x, BigInteger q){
@@ -140,15 +141,17 @@ public class LoginAttempt{
 			{
 				if(j!=i)
 				{
-					//System.out.println(mul);
-					//System.out.println("j and i are "+j+" and "+i);
-					//System.out.println("Value of x[j] and x[i] is "+x[j]+" and "+x[i]);
+					System.out.println(mul);
+					System.out.println("j and i are "+j+" and "+i);
+					System.out.println("Value of x[j] and x[i] is "+x[j]+" and "+x[i]);
 					BigDecimal div_part= new BigDecimal(x[j]).subtract(new BigDecimal(x[i]));
-					mul=mul.multiply(new BigDecimal(x[j]).divide(div_part,3,RoundingMode.HALF_UP));	
+					BigDecimal lambda=new BigDecimal(x[j]).divide(div_part,5,RoundingMode.HALF_UP);
+					mul=mul.multiply(lambda);	
 
 				}
 			}
-			hpwd=hpwd.add(mul.multiply(new BigDecimal(y[i])).remainder(new BigDecimal(q)));	
+			hpwd=hpwd.add(mul.multiply(new BigDecimal(y[i])).remainder(new BigDecimal(q)));
+			System.out.println("Hardened Password after round "+i+" is "+ hpwd);	
 		}
 		return hpwd;
 	}
@@ -178,6 +181,65 @@ public class LoginAttempt{
 	
 	public void History_File_Update(int line_no,BigInteger[] featureValuesReceived)
 	{
+
+		try {
+			    File inFile = new File("Dec_History_File.txt");
+
+			    //Construct the new file that will later be renamed to the original filename.
+			    File tempFile = new File("His.tmp");
+
+			    BufferedReader br = new BufferedReader(new FileReader("Dec_History_File.txt"));
+			    PrintWriter pw = new PrintWriter(new FileWriter(tempFile));
+
+			    String line = null;
+
+			    //Read from the original file and write to the new
+			    //unless content matches data to be removed.
+			    while ((line = br.readLine()) != null) {
+				if(line_no>0)
+				{
+					pw.print(line+"\n");
+					pw.flush();
+					line_no--;
+				}
+				else if(line_no==0)
+				{
+					line= "";
+					for(int i=1;i<16;i++)
+					{
+						System.out.println(featureValuesReceived[i]);
+						line+=featureValuesReceived[i]+" ";
+					}
+					pw.print(line+"\n");
+					pw.flush();
+					line_no--;
+				}
+				else
+				{
+					pw.print(line+"\n");
+					pw.flush();
+				}
+			    }
+			    pw.close();
+			    br.close();
+
+			    //Delete the original file
+			    if (!inFile.delete()) {
+				System.out.println("Could not delete file");
+				return;
+			    }
+
+			    //Rename the new file to the filename the original file had.
+			    if (!tempFile.renameTo(inFile)) System.out.println("Could not rename file");
+			}
+				catch(FileNotFoundException ex){
+				ex.printStackTrace();}
+				catch (IOException ex){
+				ex.printStackTrace();
+				}
+
+        }
+		/*
 		try{
 		if(line_no<8)
 		{
@@ -217,8 +279,7 @@ public class LoginAttempt{
 		}
 		}
 		catch(Exception e){
-			e.printStackTrace();}
-	}
+			e.printStackTrace();}*/
 
 
 	//Calculating lagrange multiplier

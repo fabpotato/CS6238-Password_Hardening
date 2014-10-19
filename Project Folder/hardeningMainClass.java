@@ -33,7 +33,7 @@ public class hardeningMainClass extends Exception
 		BigInteger k = BigInteger.valueOf(1);
 		BigInteger[] alpha = new BigInteger[16];
 		BigInteger[] beta = new BigInteger[16];
-		
+		String cont;
 		BigInteger[] x_coordinate = new BigInteger[16];
 		BigInteger[] y_coordinate = new BigInteger[16];
 		BigInteger hwpd;
@@ -62,12 +62,17 @@ public class hardeningMainClass extends Exception
 		//Encrypting the history file through the encryption-decryption object
 		encDec.His_Encrypt(init.c[0]);
 		System.out.println("His_Encrypt");
-
+		//After Encrypting Delete the Decrytpted file
+		File inFile = new File("Dec_History_File.txt");
+		if (!inFile.delete()) {
+				System.out.println("Could not delete file");
+			    }
 		//importing the alpha beta values
 		alpha = init.a;
 		beta = init.b;
 		
-		
+		do
+		{
 		//Creating a login attempt object to read login feature values and store them in the main method's variables
 		LoginAttempt login = new LoginAttempt();
 		h+=1;
@@ -108,8 +113,20 @@ public class hardeningMainClass extends Exception
 			//Decrypting the history file through the encryption-decryption object
 			encDec.His_Decrypt(init.c[0]);
 			System.out.println("His_Decrypt");
-			login.History_File_Update(h,featureValuesReceived);
-		}
+			login.History_File_Update(h-1,featureValuesReceived);
+
+			encDec.His_Encrypt(init.c[0]);
+			System.out.println("His_Encrypt");
+
+			//Uncomment this to Encrypt File again.
+			//After Encrypting Delete the Decrytpted file
+			/*
+			File inFile1 = new File("Dec_History_File.txt");
+			if (!inFile1.delete()) {
+					System.out.println("Could not delete file");
+				    }*/
+			
+			}
 		else if(h==8)
 		{
 			featureValuesReceived=login.loginAttempt();
@@ -195,7 +212,10 @@ public class hardeningMainClass extends Exception
 			System.out.println("His_Decrypt");
 			login.History_File_Update(h,featureValuesReceived);
 		}
-
+		Scanner in = new Scanner(System.in);
+		System.out.println("Do you want to Login again");
+		cont = in.nextLine();
+		}while(cont.equals("Yes"));
 		
 	}
 	
