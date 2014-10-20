@@ -165,7 +165,7 @@ public class initialize {
 			long size = f.length();
 			while(size<setSize-("This is the History File".getBytes().length))
 			{
-				History_file.write("0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n".getBytes());
+				History_file.write("00 00 00 00 00 00 00 00 00 00 00 00 00 00 00\n".getBytes());
 				size=f.length();
 			}
 			History_file.write("This is the History File".getBytes());

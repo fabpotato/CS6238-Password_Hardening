@@ -80,13 +80,15 @@ public class hardeningMainClass extends Exception
 		{
 			featureValuesReceived = login.loginAttempt();
 			//System.out.println(featureValuesReceived);
+			//System.out.println(h);
 			thresholdValues = login.fetchThresholdValues();
 			pwd = (String) login.pwd; //pulling password from login object
 		
 			//Assume that 
 			for(int i=1; i<=15; i++){
-		
+					
 					System.out.println("Entered Loop");
+					System.out.println(alpha[i]);
 					//Now that we have the feature receieved from the client and threshold values in local arrays, compare them and pick alpha/beta 
 					if(featureValuesReceived[i].compareTo(thresholdValues[i]) < 0){
 					
@@ -118,6 +120,7 @@ public class hardeningMainClass extends Exception
 			encDec.His_Encrypt(init.c[0]);
 			System.out.println("His_Encrypt");
 
+
 			//Uncomment this to Encrypt File again.
 			//After Encrypting Delete the Decrytpted file
 			/*
@@ -125,9 +128,17 @@ public class hardeningMainClass extends Exception
 			if (!inFile1.delete()) {
 					System.out.println("Could not delete file");
 				    }*/
+			init.Polynomials(init.q);
+			System.out.println("Init.q");
+			init.Instruction_Table();
+			System.out.println("Instruction table");
+			alpha = init.a;
+			beta = init.b;
+			
 			}
 		else if(h==8)
 		{
+
 			featureValuesReceived=login.loginAttempt();
 			thresholdValues=login.fetchThresholdValues();
 			pwd=(String) login.pwd;
@@ -160,57 +171,27 @@ public class hardeningMainClass extends Exception
 			//Decrypting the history file through the encryption-decryption object
 			encDec.His_Decrypt(init.c[0]);
 			System.out.println("His_Decrypt");
-			login.History_File_Update(h,featureValuesReceived);
+			login.History_File_Update(h-1,featureValuesReceived);
+
 			for(int i=1;i<=15;i++)
 			{
-				/*if(login.calculateMean(i)+k*login.calculateDev(i)<thresholdValues[i])
+				if(login.calculateMean(i).add(k.multiply(login.calculateDev(i))).compareTo(thresholdValues[i])==-1)
 				{
-					beta[i]=1;//make it random later
+					beta[i]=BigInteger.valueOf(1);//make it random later
 				}
-				else if(login.calculateMean(i)-k*login.calculateDev(i)<thresholdValues[i])
+				else if(login.calculateMean(i).subtract(k.multiply(login.calculateDev(i))).compareTo(thresholdValues[i])==-1)
 				{
-					alpha[i]=1;
-				}*/
-			}	
-			
-			
-		}
-		else
-		{
-			featureValuesReceived=login.loginAttempt();
-			thresholdValues=login.fetchThresholdValues();
-			pwd=(String) login.pwd;
-			for(int i=1; i<=15; i++){
-		
-			System.out.println("Entered Loop");
-			//Now that we have the feature receieved from the client and threshold values in local arrays, compare them and pick alpha/beta 
-			if(featureValuesReceived[i].compareTo(thresholdValues[i]) < 0){
-					
-				//assign 2i to the x coordinate and decrypt alpha to get y coordinate
-				System.out.println("Alpha");
-				System.out.println("Alpha value is "+alpha[i]);
-				y_coordinate[i] = alpha[i].subtract(init.generateHMac(pwd, Integer.toString(2*i), "HmacSHA256").mod(init.q));
-				x_coordinate[i] = BigInteger.valueOf(2*i);
-				System.out.println("Value of X and Y chosen is ("+x_coordinate[i]+","+y_coordinate[i]+").");
-					
-			}else{
-					
-				//assign 2i to the x coordinate and decrypt alpha to get y coordinate
-				System.out.println("Beta");
-				System.out.println("Beta value is "+beta[i]);
-				y_coordinate[i] = beta[i].subtract(init.generateHMac(pwd, Integer.toString(2*i+1), "HmacSHA256").mod(init.q));
-				x_coordinate[i] = BigInteger.valueOf((2*i)+1);
-				System.out.println("Value of X and Y chosen is ("+x_coordinate[i]+","+y_coordinate[i]+").");
-					
+					alpha[i]=BigInteger.valueOf(1);
+				}
+			System.out.println("The Alpha and Beta values are now "+alpha[i]+" and "+beta[i]+" for i= "+i);
 			}
-			}		
-			BigDecimal hpwd=login.calculateHpwdnew(y_coordinate,x_coordinate,init.q);
-			System.out.println("The hardened password is "+hpwd);
-			//Decrypting the history file through the encryption-decryption object
-			encDec.His_Decrypt(init.c[0]);
-			System.out.println("His_Decrypt");
-			login.History_File_Update(h,featureValuesReceived);
+			encDec.His_Encrypt(init.c[0]);
+			System.out.println("His_Encrypt");	
+			h=0;
+			
+			
 		}
+		
 		Scanner in = new Scanner(System.in);
 		System.out.println("Do you want to Login again");
 		cont = in.nextLine();

@@ -5,7 +5,7 @@ import java.io.*;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
-
+import java.nio.file.*;
 import au.com.bytecode.opencsv.CSVReader;
 
 public class LoginAttempt{
@@ -14,8 +14,8 @@ public class LoginAttempt{
 	BigInteger[] featureValuesReceived = new BigInteger[16];
 	private String fileDir = ""; 
 	public String pwd;
-	
-	
+	BigInteger mean;
+	String[] array1 =new String[100];
 	BigInteger[] thresholdValues = new BigInteger[16];
 	
 	public BigInteger[] loginAttempt() throws NumberFormatException, IOException{
@@ -98,29 +98,68 @@ public class LoginAttempt{
 	
 	
 	//Calculate mean of feature values by fetching them from the history file
-	public int calculateMean(int[] d){
-		
-		
-		return 0;
+	public BigInteger calculateMean(int feature){
+		mean = BigInteger.valueOf(0);
+		try
+		{
+		File file = new File("Dec_History_File.txt");
+		BufferedReader File = new BufferedReader(new FileReader(file));
+		String[] array =new String[100];
+
+		int count=0;
+		String line= null;
+		while((line=File.readLine())!= null)
+		{
+			if(count<8)
+			{
+			array = line.split(" ");
+			//System.out.println(array[feature-1]);
+			array1[count+1]=array[feature-1];
+			count++;
+			}
+			else break;
+		}
+
+		for(int i=1;i<=8;i++)
+		{
+			BigInteger no= BigInteger.valueOf(Integer.parseInt(array1[i]));
+			System.out.println(no);
+			mean=mean.add(no);
+		}
+		mean=mean.divide(BigInteger.valueOf(8));
+		}
+		catch(FileNotFoundException ex){
+				ex.printStackTrace();}
+				catch (IOException ex){
+				ex.printStackTrace();
+				}
+		System.out.println("Mean for feature "+feature+" is "+mean);
+		return mean;
 		
 	}
 	
 	
 	//Calculate median of feature values by fetching them from the history file
-	public int calculateMedian(int[] d){
-		
-		return 0;
-	}
-	
-	
-	//Based on mean and standard deviation
-	public int selectShare(){
-		
-		
-		return 1;
-		
-	}
+	public BigInteger calculateDev(int feature){
+		/*try{
+		File File = new File("Dec_History_File.txt");
+		List<String> lines = Files.readAllLines(File.toPath());
+		for(String line : lines)
+		{
+			String[] array = line.split(" ");
+			//System.out.println(array[feature-1]);
+		}
 
+		}
+		catch(FileNotFoundException ex){
+				ex.printStackTrace();}
+				catch (IOException ex){
+				ex.printStackTrace();
+				}*/
+		return BigInteger.valueOf(1);
+	}
+	
+	
 
 	
 	//To calculate the y co-ordinates
@@ -141,9 +180,9 @@ public class LoginAttempt{
 			{
 				if(j!=i)
 				{
-					System.out.println(mul);
-					System.out.println("j and i are "+j+" and "+i);
-					System.out.println("Value of x[j] and x[i] is "+x[j]+" and "+x[i]);
+					//System.out.println(mul);
+					//System.out.println("j and i are "+j+" and "+i);
+					//System.out.println("Value of x[j] and x[i] is "+x[j]+" and "+x[i]);
 					BigDecimal div_part= new BigDecimal(x[j]).subtract(new BigDecimal(x[i]));
 					BigDecimal lambda=new BigDecimal(x[j]).divide(div_part,5,RoundingMode.HALF_UP);
 					mul=mul.multiply(lambda);	
@@ -151,7 +190,7 @@ public class LoginAttempt{
 				}
 			}
 			hpwd=hpwd.add(mul.multiply(new BigDecimal(y[i])).remainder(new BigDecimal(q)));
-			System.out.println("Hardened Password after round "+i+" is "+ hpwd);	
+			//System.out.println("Hardened Password after round "+i+" is "+ hpwd);	
 		}
 		return hpwd;
 	}
