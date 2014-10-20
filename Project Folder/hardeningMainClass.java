@@ -111,7 +111,7 @@ public class hardeningMainClass extends Exception
 					
 					}
 			}		
-			BigDecimal hpwd=login.calculateHpwdnew(y_coordinate,x_coordinate,init.q);
+			BigInteger hpwd=login.calculateHpwdnew1(y_coordinate,x_coordinate,init.q);
 			System.out.println("The hardened password is "+hpwd);
 			//Decrypting the history file through the encryption-decryption object
 			encDec.His_Decrypt(init.c[0]);

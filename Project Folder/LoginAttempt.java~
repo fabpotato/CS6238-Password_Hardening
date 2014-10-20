@@ -14,7 +14,7 @@ public class LoginAttempt{
 	BigInteger[] featureValuesReceived = new BigInteger[16];
 	private String fileDir = ""; 
 	public String pwd;
-	BigInteger mean;
+	BigInteger mean,diff;
 	String[] array1 =new String[100];
 	BigInteger[] thresholdValues = new BigInteger[16];
 	
@@ -133,7 +133,7 @@ public class LoginAttempt{
 				catch (IOException ex){
 				ex.printStackTrace();
 				}
-		System.out.println("Mean for feature "+feature+" is "+mean);
+		//System.out.println("Mean for feature "+feature+" is "+mean);
 		return mean;
 		
 	}
@@ -141,22 +141,53 @@ public class LoginAttempt{
 	
 	//Calculate median of feature values by fetching them from the history file
 	public BigInteger calculateDev(int feature){
-		/*try{
-		File File = new File("Dec_History_File.txt");
-		List<String> lines = Files.readAllLines(File.toPath());
-		for(String line : lines)
+		mean = BigInteger.valueOf(0);
+		diff = BigInteger.valueOf(0);
+		try
 		{
-			String[] array = line.split(" ");
+		File file = new File("Dec_History_File.txt");
+		BufferedReader File = new BufferedReader(new FileReader(file));
+		String[] array =new String[100];
+
+		int count=0;
+		String line= null;
+		while((line=File.readLine())!= null)
+		{
+			if(count<8)
+			{
+			array = line.split(" ");
 			//System.out.println(array[feature-1]);
+			array1[count+1]=array[feature-1];
+			count++;
+			}
+			else break;
 		}
 
+		for(int i=1;i<=8;i++)
+		{
+			BigInteger no= BigInteger.valueOf(Integer.parseInt(array1[i]));
+			System.out.println(no);
+			mean=mean.add(no);
+		}
+		mean=mean.divide(BigInteger.valueOf(8));
 		}
 		catch(FileNotFoundException ex){
 				ex.printStackTrace();}
 				catch (IOException ex){
 				ex.printStackTrace();
-				}*/
-		return BigInteger.valueOf(1);
+				}
+		System.out.println("Mean for feature "+feature+" is "+mean);
+		
+		for(int i=1;i<=8;i++)
+		{
+			BigInteger no= BigInteger.valueOf(Integer.parseInt(array1[i]));
+			diff = diff.add((no.subtract(mean)).multiply((no.subtract(mean))));
+			
+		}
+			BigInteger var = diff.divide(BigInteger.valueOf(8));
+			BigInteger dev =  new BigDecimal.valueOf(Math.sqrt(var.doubleValue())).toBigInteger();
+		System.out.println("The deviation for feature "+feature+" is "+dev);
+		return dev;
 	}
 	
 	
@@ -190,7 +221,7 @@ public class LoginAttempt{
 				}
 			}
 			hpwd=hpwd.add(mul.multiply(new BigDecimal(y[i])).remainder(new BigDecimal(q)));
-			System.out.println("Hardened Password after round "+i+" is "+ hpwd);	
+			//System.out.println("Hardened Password after round "+i+" is "+ hpwd);	
 		}
 		return hpwd;
 	}
@@ -201,23 +232,52 @@ public class LoginAttempt{
 		BigInteger hpwd =  BigInteger.valueOf(0);
 		for(int i=1;i<=15;i++)
 		{
+			BigInteger num = new BigInteger("1");	
+			BigInteger den = new BigInteger("1");	
 			BigInteger mul =  BigInteger.valueOf(1);
 			for(int j=1;j<=15;j++)
 			{
 				if(j!=i)
 				{
-					//System.out.println("j and i are "+j+" and "+i);
-					//System.out.println("Value of x[j] and x[i] is "+x[j]+" and "+x[i]);
-					BigInteger div_part= x[j].subtract(x[i]);
-					mul=mul.multiply(x[j].divide(div_part));	
+					BigInteger sub= x[j].subtract(x[i]);
+					num= num.multiply(x[j]);
+					den=den.multiply(x[j].subtract(x[i]));
+
 				}
 			}
+				
 				//System.out.println(mul);
-				hpwd=hpwd.add(mul.multiply(y[i]).mod(q));	
+				BigInteger sum = y[i].multiply(num);
+				sum = sum.divide(den);
+				//sum = sum.mod(q);
+				hpwd=hpwd.add(sum.mod(q));//.mod(q);	
 		}
 		return hpwd;
 	}
 	
+	/*	public BigInteger reconstructHpwd(BigInteger y[], BigInteger x[], BigInteger q) {
+		BigInteger hpwd_recon = new BigInteger("0");
+		for (int i = 1; i < 16; i++) {
+			BigInteger lambda = lambda(y,x,q,i);
+			BigInteger add = y[i].multiply(lambda).mod(q);
+			hpwd_recon = hpwd_recon.add(add).mod(q);
+		}
+		hpwd_recon = hpwd_recon.mod(q);
+		return hpwd_recon;
+	}
+
+	private BigInteger lambda(BigInteger y[], BigInteger x[], BigInteger q, int i) {
+		BigInteger lambda = new BigInteger("1");
+		for (int j = 1; j < 16; j++) {
+			if (i != (j)) {
+				BigInteger substract = (x[j].subtract(x[i])).mod(q);
+				BigInteger modinverse = substract.modInverse(q);
+				BigInteger divide = x[j].multiply(modinverse).mod(q);
+				lambda = (lambda.multiply(divide)).mod(q);
+			}
+		}
+		return lambda;
+	}*/
 	public void History_File_Update(int line_no,BigInteger[] featureValuesReceived)
 	{
 

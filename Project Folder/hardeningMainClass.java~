@@ -89,13 +89,14 @@ public class hardeningMainClass extends Exception
 					
 					System.out.println("Entered Loop");
 					System.out.println(alpha[i]);
+					System.out.println(beta[i]);
 					//Now that we have the feature receieved from the client and threshold values in local arrays, compare them and pick alpha/beta 
 					if(featureValuesReceived[i].compareTo(thresholdValues[i]) < 0){
 					
 						//assign 2i to the x coordinate and decrypt alpha to get y coordinate
 						System.out.println("Alpha");
 						System.out.println("Alpha value is "+alpha[i]);
-						y_coordinate[i] = alpha[i].subtract(init.generateHMac(pwd, Integer.toString(2*i), "HmacSHA256").mod(init.q));
+						y_coordinate[i] = alpha[i].divide(init.generateHMac(pwd, Integer.toString(2*i), "HmacSHA256").mod(init.q));
 						x_coordinate[i] = BigInteger.valueOf(2*i);
 						System.out.println("Value of X and Y chosen is ("+x_coordinate[i]+","+y_coordinate[i]+").");
 					
@@ -104,13 +105,13 @@ public class hardeningMainClass extends Exception
 						//assign 2i to the x coordinate and decrypt alpha to get y coordinate
 						System.out.println("Beta");
 						System.out.println("Beta value is "+beta[i]);
-						y_coordinate[i] = beta[i].subtract(init.generateHMac(pwd, Integer.toString(2*i+1), "HmacSHA256").mod(init.q));
+						y_coordinate[i] = beta[i].divide(init.generateHMac(pwd, Integer.toString(2*i+1), "HmacSHA256").mod(init.q));
 						x_coordinate[i] = BigInteger.valueOf((2*i)+1);
 						System.out.println("Value of X and Y chosen is ("+x_coordinate[i]+","+y_coordinate[i]+").");
 					
 					}
 			}		
-			BigDecimal hpwd=login.calculateHpwdnew(y_coordinate,x_coordinate,init.q);
+			BigInteger hpwd=login.calculateHpwdnew1(y_coordinate,x_coordinate,init.q);
 			System.out.println("The hardened password is "+hpwd);
 			//Decrypting the history file through the encryption-decryption object
 			encDec.His_Decrypt(init.c[0]);
