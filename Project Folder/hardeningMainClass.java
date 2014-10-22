@@ -186,13 +186,14 @@ public class hardeningMainClass extends Exception
 
 			for(int i=1;i<=15;i++)
 			{
+				Random rand= new Random();
 				if(login.calculateMean(i).add(k.multiply(login.calculateDev(i))).compareTo(thresholdValues[i])==-1)
 				{
-					beta[i]=BigInteger.valueOf(1);//make it random later
+					beta[i]=BigInteger.valueOf(rand.nextInt(1000)+1);//make it random later
 				}
 				else if(login.calculateMean(i).subtract(k.multiply(login.calculateDev(i))).compareTo(thresholdValues[i])==-1)
 				{
-					alpha[i]=BigInteger.valueOf(1);
+					alpha[i]=BigInteger.valueOf(rand.nextInt(1000)+1);
 				}
 			System.out.println("The Alpha and Beta values are now "+alpha[i]+" and "+beta[i]+" for i= "+i);
 			}
