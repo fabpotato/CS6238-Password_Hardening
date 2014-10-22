@@ -90,9 +90,9 @@ public class initialize {
 		
 		for(int i=1;i<=15;i++)
 		{
-			a[i]= Polynomial_Calculation(2*i).add(generateHMac("password", Integer.toString(2*i), "HmacSHA256").mod(q));
+			a[i]= (Polynomial_Calculation(2*i).add(generateHMac("password", Integer.toString(2*i), "HmacSHA256"))).mod(q);
 			System.out.println("Alpha value is "+a[i]);
-			b[i]= Polynomial_Calculation((2*i)+1).add(generateHMac("password", Integer.toString((2*i)+1), "HmacSHA256").mod(q));
+			b[i]= (Polynomial_Calculation((2*i)+1).add(generateHMac("password", Integer.toString((2*i)+1), "HmacSHA256"))).mod(q);
 			System.out.println("Beta value is "+b[i]);
 		}
 

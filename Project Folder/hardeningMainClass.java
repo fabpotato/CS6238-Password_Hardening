@@ -96,7 +96,7 @@ public class hardeningMainClass extends Exception
 						//assign 2i to the x coordinate and decrypt alpha to get y coordinate
 						System.out.println("Alpha");
 						System.out.println("Alpha value is "+alpha[i]);
-						y_coordinate[i] = alpha[i].subtract(init.generateHMac(pwd, Integer.toString(2*i), "HmacSHA256").mod(init.q));
+						y_coordinate[i] = (alpha[i].subtract(init.generateHMac(pwd, Integer.toString(2*i), "HmacSHA256"))).mod(init.q);
 						x_coordinate[i] = BigInteger.valueOf(2*i);
 						System.out.println("Value of X and Y chosen is ("+x_coordinate[i]+","+y_coordinate[i]+").");
 					
@@ -105,37 +105,47 @@ public class hardeningMainClass extends Exception
 						//assign 2i to the x coordinate and decrypt alpha to get y coordinate
 						System.out.println("Beta");
 						System.out.println("Beta value is "+beta[i]);
-						y_coordinate[i] = beta[i].subtract(init.generateHMac(pwd, Integer.toString(2*i+1), "HmacSHA256").mod(init.q));
+						y_coordinate[i] = (beta[i].subtract(init.generateHMac(pwd, Integer.toString(2*i+1), "HmacSHA256"))).mod(init.q);
 						x_coordinate[i] = BigInteger.valueOf((2*i)+1);
 						System.out.println("Value of X and Y chosen is ("+x_coordinate[i]+","+y_coordinate[i]+").");
 					
 					}
 			}		
-			BigInteger hpwd=login.calculateHpwdnew1(y_coordinate,x_coordinate,init.q);
+			BigInteger hpwd=login.reconstructHpwd(y_coordinate,x_coordinate,init.q);
 			System.out.println("The hardened password is "+hpwd);
 			//Decrypting the history file through the encryption-decryption object
 			encDec.His_Decrypt(init.c[0]);
 			System.out.println("His_Decrypt");
-			login.History_File_Update(h-1,featureValuesReceived);
+			int x = login.String_Search();
+			if(x<=-1)
+			{
+				System.out.println("Login Failed");
+				System.out.println("System exiting");
+				System.exit(0);
+			}
+			else
+			{
+				System.out.println("Login Successful");
+				login.History_File_Update(h-1,featureValuesReceived);
 
-			encDec.His_Encrypt(init.c[0]);
-			System.out.println("His_Encrypt");
+				encDec.His_Encrypt(init.c[0]);
+				System.out.println("His_Encrypt");
 
 
-			//Uncomment this to Encrypt File again.
-			//After Encrypting Delete the Decrytpted file
-			/*
-			File inFile1 = new File("Dec_History_File.txt");
-			if (!inFile1.delete()) {
-					System.out.println("Could not delete file");
-				    }*/
-			init.Polynomials(init.q);
-			System.out.println("Init.q");
-			init.Instruction_Table();
-			System.out.println("Instruction table");
-			alpha = init.a;
-			beta = init.b;
-			
+				//Uncomment this to Encrypt File again.
+				//After Encrypting Delete the Decrytpted file
+				/*
+				File inFile1 = new File("Dec_History_File.txt");
+				if (!inFile1.delete()) {
+						System.out.println("Could not delete file");
+					    }*/
+				init.Polynomials(init.q);
+				System.out.println("Init.q");
+				init.Instruction_Table();
+				System.out.println("Instruction table");
+				alpha = init.a;
+				beta = init.b;
+			}
 			}
 		else if(h==8)
 		{

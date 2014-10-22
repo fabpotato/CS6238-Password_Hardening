@@ -225,8 +225,43 @@ public class LoginAttempt{
 		}
 		return hpwd;
 	}
+	
+	public int String_Search()
+	{
+		int indexfound=-2;
+		try {
+			
+			BufferedReader bf = new BufferedReader(new FileReader("Dec_History_File.txt"));
+			
+			// Start a line count and declare a string to hold our current line.
+			int linecount = 0;
+    			String line;
 
-	public BigInteger calculateHpwdnew1(BigInteger[] y,BigInteger[] x, BigInteger q){
+			// Let the user know what we are searching for
+			System.out.println("Searching for This is the History File in Decrypted File...");
+
+			// Loop through each line, stashing the line into our line variable.
+			while (( line = bf.readLine()) != null)
+			{
+    				// Increment the count and find the index of the word
+    				linecount++;
+    				indexfound = line.indexOf("This is the History File");
+
+    				// If greater than -1, means we found the word
+    				if (indexfound > -1) {
+    				     System.out.println("Found");
+    				}
+			}
+
+			// Close the file after done searching
+			bf.close();
+		}
+		catch (IOException e) {
+			System.out.println("IO Error Occurred: " + e.toString());
+		}
+		return indexfound;
+	}
+	/*public BigInteger calculateHpwdnew1(BigInteger[] y,BigInteger[] x, BigInteger q){
 		
 
 		BigInteger hpwd =  BigInteger.valueOf(0);
@@ -253,9 +288,9 @@ public class LoginAttempt{
 				hpwd=hpwd.add(sum.mod(q));//.mod(q);	
 		}
 		return hpwd;
-	}
+	}*/
 	
-	/*	public BigInteger reconstructHpwd(BigInteger y[], BigInteger x[], BigInteger q) {
+		public BigInteger reconstructHpwd(BigInteger y[], BigInteger x[], BigInteger q) {
 		BigInteger hpwd_recon = new BigInteger("0");
 		for (int i = 1; i < 16; i++) {
 			BigInteger lambda = lambda(y,x,q,i);
@@ -277,7 +312,7 @@ public class LoginAttempt{
 			}
 		}
 		return lambda;
-	}*/
+	}
 	public void History_File_Update(int line_no,BigInteger[] featureValuesReceived)
 	{
 
